@@ -15,6 +15,7 @@
 from dataclasses import dataclass
 
 from ..configs import CameraConfig, ColorMode
+
 __all__ = ["CameraConfig", "ColorMode", "Reachy2CameraConfig"]
 
 

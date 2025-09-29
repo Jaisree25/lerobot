@@ -24,13 +24,13 @@ import time
 from pathlib import Path
 from threading import Event, Lock, Thread
 from typing import Any
-from numpy.typing import NDArray
+
+from numpy.typing import NDArray # type: ignore  # TODO: add type stubs for numpy.typing
 
 # Fix MSMF hardware transform compatibility for Windows before importing cv2
 if platform.system() == "Windows" and "OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS" not in os.environ:
     os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
-import cv2 # type: ignore  # TODO: add type stubs for OpenCV
-import numpy as np
+import cv2  # type: ignore  # TODO: add type stubs for OpenCV
 
 from lerobot.utils.errors import DeviceAlreadyConnectedError, DeviceNotConnectedError
 

@@ -16,9 +16,8 @@
 
 import abc
 from typing import Any
-from numpy.typing import NDArray
 
-import numpy as np
+from numpy.typing import NDArray # type: ignore  # TODO: add type stubs for numpy.typing
 
 from .configs import CameraConfig, ColorMode
 

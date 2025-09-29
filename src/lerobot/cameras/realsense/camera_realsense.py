@@ -20,14 +20,13 @@ import logging
 import time
 from threading import Event, Lock, Thread
 from typing import Any
-from numpy.typing import NDArray
 
-
-import cv2 # type: ignore  # TODO: add type stubs for OpenCV
-import numpy as np
+import cv2  # type: ignore  # TODO: add type stubs for OpenCV
+import numpy as np # type: ignore  # TODO: add type stubs for numpy
+from numpy.typing import NDArray # type: ignore  # TODO: add type stubs for numpy.typing
 
 try:
-    import pyrealsense2 as rs # type: ignore  # TODO: add type stubs for pyrealsense2
+    import pyrealsense2 as rs  # type: ignore  # TODO: add type stubs for pyrealsense2
 except Exception as e:
     logging.info(f"Could not import realsense: {e}")
 
@@ -266,7 +265,7 @@ class RealSenseCamera(Camera):
         serial_number = str(found_devices[0]["serial_number"])
         return serial_number
 
-    def _configure_rs_pipeline_config(self, rs_config: rs.config) -> None:
+    def _configure_rs_pipeline_config(self, rs_config: Any) -> None:
         """Creates and configures the RealSense pipeline configuration object."""
         rs.config.enable_device(rs_config, self.serial_number)
 
@@ -340,7 +339,7 @@ class RealSenseCamera(Camera):
             )
 
         start_time = time.perf_counter()
-        
+
         if self.rs_pipeline is None:
             raise RuntimeError(f"{self}: rs_pipeline must be initialized before use.")
 
@@ -386,7 +385,7 @@ class RealSenseCamera(Camera):
 
         if self.rs_pipeline is None:
             raise RuntimeError(f"{self}: rs_pipeline must be initialized before use.")
-        
+
         ret, frame = self.rs_pipeline.try_wait_for_frames(timeout_ms=timeout_ms)
 
         if not ret or frame is None:
@@ -462,7 +461,7 @@ class RealSenseCamera(Camera):
         """
         if self.stop_event is None:
             raise RuntimeError(f"{self}: stop_event is not initialized before starting read loop.")
-        
+
         while not self.stop_event.is_set():
             try:
                 color_image = self.read(timeout_ms=500)

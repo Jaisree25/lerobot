@@ -20,7 +20,6 @@ from ..configs import CameraConfig, ColorMode, Cv2Rotation
 __all__ = ["OpenCVCameraConfig", "ColorMode", "Cv2Rotation"]
 
 
-
 @CameraConfig.register_subclass("opencv")
 @dataclass
 class OpenCVCameraConfig(CameraConfig):

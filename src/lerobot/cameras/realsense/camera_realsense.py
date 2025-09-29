@@ -21,11 +21,11 @@ import time
 from threading import Event, Lock, Thread
 from typing import Any
 
-import cv2
+import cv2 # type: ignore  # TODO: add type stubs for OpenCV
 import numpy as np
 
 try:
-    import pyrealsense2 as rs
+    import pyrealsense2 as rs # type: ignore  # TODO: add type stubs for pyrealsense2
 except Exception as e:
     logging.info(f"Could not import realsense: {e}")
 
@@ -293,7 +293,9 @@ class RealSenseCamera(Camera):
         if not self.is_connected:
             raise DeviceNotConnectedError(f"Cannot validate settings for {self} as it is not connected.")
 
-        assert self.rs_profile is not None
+        if self.rs_profile is None:
+            raise RuntimeError(f"{self}: rs_profile must be initialized before use.")
+
         stream = self.rs_profile.get_stream(rs.stream.color).as_video_stream_profile()
 
         if self.fps is None:
@@ -336,7 +338,10 @@ class RealSenseCamera(Camera):
             )
 
         start_time = time.perf_counter()
-        assert self.rs_pipeline is not None
+        
+        if self.rs_pipeline is None:
+            raise RuntimeError(f"{self}: rs_pipeline must be initialized before use.")
+
         ret, frame = self.rs_pipeline.try_wait_for_frames(timeout_ms=timeout_ms)
 
         if not ret or frame is None:
@@ -376,7 +381,10 @@ class RealSenseCamera(Camera):
             raise DeviceNotConnectedError(f"{self} is not connected.")
 
         start_time = time.perf_counter()
-        assert self.rs_pipeline is not None
+
+        if self.rs_pipeline is None:
+            raise RuntimeError(f"{self}: rs_pipeline must be initialized before use.")
+        
         ret, frame = self.rs_pipeline.try_wait_for_frames(timeout_ms=timeout_ms)
 
         if not ret or frame is None:

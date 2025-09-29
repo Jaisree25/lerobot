@@ -18,7 +18,7 @@ import abc
 from dataclasses import dataclass
 from enum import Enum
 
-import draccus
+import draccus # type: ignore  # TODO: add type stubs for draccus
 
 
 class ColorMode(str, Enum):

@@ -274,6 +274,7 @@ default.extend-ignore-identifiers-re = [
 python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
+<<<<<<< HEAD
 ignore_missing_imports = false
 strict = true
 disallow_untyped_defs = true
@@ -348,3 +349,6 @@ module = "lerobot.cameras.*"
 # module = "lerobot.scripts.*"
 # # include = "src/lerobot/scripts/**/*.py"
 
+=======
+# ignore_missing_imports = true
+>>>>>>> a3d6136 (External import issues in cameras module ignored with TODO links; replaced assert with raise)

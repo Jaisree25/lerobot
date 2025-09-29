@@ -34,7 +34,7 @@ class Cv2Rotation(int, Enum):
 
 
 @dataclass(kw_only=True)
-class CameraConfig(draccus.ChoiceRegistry, abc.ABC):
+class CameraConfig(draccus.ChoiceRegistry, abc.ABC): # type: ignore  # TODO: add type stubs for draccus
     fps: int | None = None
     width: int | None = None
     height: int | None = None

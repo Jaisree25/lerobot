@@ -24,11 +24,12 @@ import time
 from pathlib import Path
 from threading import Event, Lock, Thread
 from typing import Any
+from numpy.typing import NDArray
 
 # Fix MSMF hardware transform compatibility for Windows before importing cv2
 if platform.system() == "Windows" and "OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS" not in os.environ:
     os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
-import cv2 # type: ignore  # TODO: add type stubs for draccus
+import cv2 # type: ignore  # TODO: add type stubs for OpenCV
 import numpy as np
 
 from lerobot.utils.errors import DeviceAlreadyConnectedError, DeviceNotConnectedError
@@ -121,7 +122,7 @@ class OpenCVCamera(Camera):
         self.thread: Thread | None = None
         self.stop_event: Event | None = None
         self.frame_lock: Lock = Lock()
-        self.latest_frame: np.ndarray | None = None
+        self.latest_frame: NDArray[Any] | None = None
         self.new_frame_event: Event = Event()
 
         self.rotation: int | None = get_cv2_rotation(config.rotation)
@@ -140,7 +141,7 @@ class OpenCVCamera(Camera):
         """Checks if the camera is currently connected and opened."""
         return isinstance(self.videocapture, cv2.VideoCapture) and self.videocapture.isOpened()
 
-    def connect(self, warmup: bool = True):
+    def connect(self, warmup: bool = True) -> None:
         """
         Connects to the OpenCV camera specified in the configuration.
 
@@ -304,7 +305,7 @@ class OpenCVCamera(Camera):
 
         return found_cameras_info
 
-    def read(self, color_mode: ColorMode | None = None) -> np.ndarray:
+    def read(self, color_mode: ColorMode | None = None) -> NDArray[Any]:
         """
         Reads a single frame synchronously from the camera.
 
@@ -347,7 +348,7 @@ class OpenCVCamera(Camera):
 
         return processed_frame
 
-    def _postprocess_image(self, image: np.ndarray, color_mode: ColorMode | None = None) -> np.ndarray:
+    def _postprocess_image(self, image: NDArray[Any], color_mode: ColorMode | None = None) -> NDArray[Any]:
         """
         Applies color conversion, dimension validation, and rotation to a raw frame.
 
@@ -390,7 +391,7 @@ class OpenCVCamera(Camera):
 
         return processed_image
 
-    def _read_loop(self):
+    def _read_loop(self) -> None:
         """
         Internal loop run by the background thread for asynchronous reading.
 
@@ -401,6 +402,9 @@ class OpenCVCamera(Camera):
 
         Stops on DeviceNotConnectedError, logs other errors and continues.
         """
+        if self.stop_event is None:
+            raise RuntimeError(f"{self}: stop_event is not initialized before starting read loop.")
+
         while not self.stop_event.is_set():
             try:
                 color_image = self.read()
@@ -437,7 +441,7 @@ class OpenCVCamera(Camera):
         self.thread = None
         self.stop_event = None
 
-    def async_read(self, timeout_ms: float = 200) -> np.ndarray:
+    def async_read(self, timeout_ms: float = 200) -> NDArray[Any]:
         """
         Reads the latest available frame asynchronously.
 
@@ -480,7 +484,7 @@ class OpenCVCamera(Camera):
 
         return frame
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         """
         Disconnects from the camera and cleans up resources.
 

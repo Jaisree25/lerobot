@@ -20,6 +20,8 @@ import logging
 import time
 from threading import Event, Lock, Thread
 from typing import Any
+from numpy.typing import NDArray
+
 
 import cv2 # type: ignore  # TODO: add type stubs for OpenCV
 import numpy as np
@@ -132,7 +134,7 @@ class RealSenseCamera(Camera):
         self.thread: Thread | None = None
         self.stop_event: Event | None = None
         self.frame_lock: Lock = Lock()
-        self.latest_frame: np.ndarray | None = None
+        self.latest_frame: NDArray[Any] | None = None
         self.new_frame_event: Event = Event()
 
         self.rotation: int | None = get_cv2_rotation(config.rotation)
@@ -150,7 +152,7 @@ class RealSenseCamera(Camera):
         """Checks if the camera pipeline is started and streams are active."""
         return self.rs_pipeline is not None and self.rs_profile is not None
 
-    def connect(self, warmup: bool = True):
+    def connect(self, warmup: bool = True) -> None:
         """
         Connects to the RealSense camera specified in the configuration.
 
@@ -264,7 +266,7 @@ class RealSenseCamera(Camera):
         serial_number = str(found_devices[0]["serial_number"])
         return serial_number
 
-    def _configure_rs_pipeline_config(self, rs_config):
+    def _configure_rs_pipeline_config(self, rs_config: rs.config) -> None:
         """Creates and configures the RealSense pipeline configuration object."""
         rs.config.enable_device(rs_config, self.serial_number)
 
@@ -311,7 +313,7 @@ class RealSenseCamera(Camera):
                 self.width, self.height = actual_width, actual_height
                 self.capture_width, self.capture_height = actual_width, actual_height
 
-    def read_depth(self, timeout_ms: int = 200) -> np.ndarray:
+    def read_depth(self, timeout_ms: int = 200) -> NDArray[Any]:
         """
         Reads a single frame (depth) synchronously from the camera.
 
@@ -357,7 +359,7 @@ class RealSenseCamera(Camera):
 
         return depth_map_processed
 
-    def read(self, color_mode: ColorMode | None = None, timeout_ms: int = 200) -> np.ndarray:
+    def read(self, color_mode: ColorMode | None = None, timeout_ms: int = 200) -> NDArray[Any]:
         """
         Reads a single frame (color) synchronously from the camera.
 
@@ -401,8 +403,8 @@ class RealSenseCamera(Camera):
         return color_image_processed
 
     def _postprocess_image(
-        self, image: np.ndarray, color_mode: ColorMode | None = None, depth_frame: bool = False
-    ) -> np.ndarray:
+        self, image: NDArray[Any], color_mode: ColorMode | None = None, depth_frame: bool = False
+    ) -> NDArray[Any]:
         """
         Applies color conversion, dimension validation, and rotation to a raw color frame.
 
@@ -447,7 +449,7 @@ class RealSenseCamera(Camera):
 
         return processed_image
 
-    def _read_loop(self):
+    def _read_loop(self) -> None:
         """
         Internal loop run by the background thread for asynchronous reading.
 
@@ -458,6 +460,9 @@ class RealSenseCamera(Camera):
 
         Stops on DeviceNotConnectedError, logs other errors and continues.
         """
+        if self.stop_event is None:
+            raise RuntimeError(f"{self}: stop_event is not initialized before starting read loop.")
+        
         while not self.stop_event.is_set():
             try:
                 color_image = self.read(timeout_ms=500)
@@ -483,7 +488,7 @@ class RealSenseCamera(Camera):
         self.thread.daemon = True
         self.thread.start()
 
-    def _stop_read_thread(self):
+    def _stop_read_thread(self) -> None:
         """Signals the background read thread to stop and waits for it to join."""
         if self.stop_event is not None:
             self.stop_event.set()
@@ -495,7 +500,7 @@ class RealSenseCamera(Camera):
         self.stop_event = None
 
     # NOTE(Steven): Missing implementation for depth for now
-    def async_read(self, timeout_ms: float = 200) -> np.ndarray:
+    def async_read(self, timeout_ms: float = 200) -> NDArray[Any]:
         """
         Reads the latest available frame data (color) asynchronously.
 
@@ -538,7 +543,7 @@ class RealSenseCamera(Camera):
 
         return frame
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         """
         Disconnects from the camera, stops the pipeline, and cleans up resources.
 

@@ -25,7 +25,7 @@ from pathlib import Path
 from threading import Event, Lock, Thread
 from typing import Any
 
-from numpy.typing import NDArray # type: ignore  # TODO: add type stubs for numpy.typing
+from numpy.typing import NDArray  # type: ignore  # TODO: add type stubs for numpy.typing
 
 # Fix MSMF hardware transform compatibility for Windows before importing cv2
 if platform.system() == "Windows" and "OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS" not in os.environ:

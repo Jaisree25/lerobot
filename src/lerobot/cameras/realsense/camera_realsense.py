@@ -22,8 +22,8 @@ from threading import Event, Lock, Thread
 from typing import Any
 
 import cv2  # type: ignore  # TODO: add type stubs for OpenCV
-import numpy as np # type: ignore  # TODO: add type stubs for numpy
-from numpy.typing import NDArray # type: ignore  # TODO: add type stubs for numpy.typing
+import numpy as np  # type: ignore  # TODO: add type stubs for numpy
+from numpy.typing import NDArray  # type: ignore  # TODO: add type stubs for numpy.typing
 
 try:
     import pyrealsense2 as rs  # type: ignore  # TODO: add type stubs for pyrealsense2
